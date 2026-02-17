@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ramadan Countdown</title>
+
+    <style>
+      :root {
+        --base-size: 1; /* zoom scale */
+        --text-color: #00ffcc; /* countdown text color */
+        --day-color: #ffd166; /* day text color */
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: #0c1b2a;
+        color: white;
+        margin: 0;
+        transition: background 0.3s ease;
+      }
+
+      h1 {
+        margin: 20px 0 10px 0;
+        font-size: calc(2rem * var(--base-size));
+      }
+
+      /* ---------- DARK PANEL FOR TITLE & DAY ---------- */
+      .panel {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 15px;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        color: white;
+        margin-bottom: 10px;
+      }
+
+      /* ---------- CLOUD CONTROL PANEL ---------- */
+      .controls {
+        display: inline-block;
+        padding: 15px 25px;
+        margin: 10px auto 20px auto;
+        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.5); /* dark semi-transparent */
+        backdrop-filter: blur(12px);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .controls label {
+        font-weight: bold;
+        margin-right: 5px;
+      }
+
+      input[type="range"],
+      input[type="color"] {
+        width: 120px;
+        margin-right: 10px;
+      }
+
+      /* ---------- FULL WIDTH CARDS ---------- */
+      .card {
+        background: #13293d;
+        width: 100vw;
+        max-width: none;
+        margin: 0;
+        border-radius: 0;
+        padding: 40px 10px;
+        box-sizing: border-box;
+        box-shadow: 0 0 25px rgba(0, 255, 204, 0.2);
+      }
+
+      /* ---------- TEXT ---------- */
+      .day {
+        font-size: calc(3vw * var(--base-size));
+        color: var(--day-color);
+        margin: 10px 0;
+      }
+
+      .time-label {
+        font-size: calc(2vw * var(--base-size));
+        margin-bottom: 10px;
+      }
+
+      .countdown {
+        font-weight: bold;
+        color: var(--text-color);
+        font-size: calc(8vw * var(--base-size));
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="panel">
+      <h1>Ramadan Countdown</h1>
+    </div>
+
+    <div class="controls">
+      <label>Background:</label>
+      <input type="color" id="bgPicker" value="#0c1b2a" />
+
+      <label>Text Color:</label>
+      <input type="color" id="textPicker" value="#00ffcc" />
+
+      <label>Zoom:</label>
+      <input
+        type="range"
+        id="zoomSlider"
+        min="1"
+        max="3"
+        step="0.1"
+        value="1"
+      />
+      <span id="zoomValue">100%</span>
+    </div>
+
+    <div class="panel" id="ramadanDay" class="day"></div>
+
+    <div class="card">
+      <div class="time-label">Sunrise</div>
+      <div id="sunriseTime"></div>
+      <div id="sunriseCountdown" class="countdown"></div>
+    </div>
+
+    <div class="card">
+      <div class="time-label">Maghrib</div>
+      <div id="maghribTime"></div>
+      <div id="maghribCountdown" class="countdown"></div>
+    </div>
+
+    <script>
+      /* ---------- PARSE CSV ---------- */
+      async function loadCSV() {
+        try {
+          const res = await fetch("Ramadan_timings.csv");
+          const text = await res.text();
+
+          const data = parseCSV(text);
+          displayToday(data);
+        } catch (e) {
+          document.body.innerHTML =
+            "<h2>Error loading Ramadan timings file.</h2>";
+          console.error(e);
+        }
+      }
+
+      /* ---------- CSV PARSER ---------- */
+      function parseCSV(text) {
+        const lines = text.trim().split("\n");
+        const headers = lines[0].split(",");
+        const data = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const regex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
+          const matches = lines[i].match(regex);
+          if (!matches) continue;
+
+          const row = {};
+          headers.forEach((header, idx) => {
+            row[header.trim()] = matches[idx].replace(/^"|"$/g, "").trim();
+          });
+          data.push(row);
+        }
+        return data;
+      }
+
+      /* ---------- DISPLAY TODAY ---------- */
+      function displayToday(data) {
+        const today = new Date();
+        const todayRow = data.find((row) => {
+          const dateStr = `${row["Gregorian Date"]} ${today.getFullYear()}`;
+          const dt = new Date(dateStr);
+          return dt.toDateString() === today.toDateString();
+        });
+
+        if (!todayRow) {
+          document.getElementById("ramadanDay").innerText =
+            "No Ramadan data for today.";
+          return;
+        }
+
+        document.getElementById("ramadanDay").innerText =
+          `Ramadan Day ${todayRow.Day}`;
+        document.getElementById("sunriseTime").innerText = todayRow.Sunrise;
+        document.getElementById("maghribTime").innerText = todayRow.Maghrib;
+
+        startCountdown("sunriseCountdown", todayRow.Sunrise);
+        startCountdown("maghribCountdown", todayRow.Maghrib);
+      }
+
+      /* ---------- COUNTDOWN ---------- */
+      function startCountdown(elementId, timeString) {
+        const interval = setInterval(() => {
+          const now = new Date();
+          const [hours, minutes] = timeString.split(":").map(Number);
+          const target = new Date();
+          target.setHours(hours, minutes, 0, 0);
+          let diff = target - now;
+
+          if (diff <= 0) {
+            document.getElementById(elementId).innerText = "Time Passed";
+            clearInterval(interval);
+            return;
+          }
+
+          const h = Math.floor(diff / (1000 * 60 * 60));
+          const m = Math.floor((diff / (1000 * 60)) % 60);
+          const s = Math.floor((diff / 1000) % 60);
+
+          document.getElementById(elementId).innerText = `${h}h ${m}m ${s}s`;
+        }, 1000);
+      }
+
+      /* ---------- BACKGROUND PICKER ---------- */
+      document
+        .getElementById("bgPicker")
+        .addEventListener("input", function () {
+          document.body.style.background = this.value;
+        });
+
+      /* ---------- TEXT COLOR PICKER ---------- */
+      document
+        .getElementById("textPicker")
+        .addEventListener("input", function () {
+          document.documentElement.style.setProperty(
+            "--text-color",
+            this.value,
+          );
+        });
+
+      /* ---------- SHARP ZOOM ---------- */
+      document
+        .getElementById("zoomSlider")
+        .addEventListener("input", function () {
+          const scale = this.value;
+          document.documentElement.style.setProperty("--base-size", scale);
+          document.getElementById("zoomValue").innerText =
+            Math.round(scale * 100) + "%";
+        });
+
+      /* ---------- INIT ---------- */
+      loadCSV();
+    </script>
+  </body>
+</html>
