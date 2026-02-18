@@ -358,7 +358,18 @@
           document.documentElement.style.setProperty("--font", savedFont);
           fontSelect.value = savedFont; // Set the font select value
         }
+        // Get moon toggle checkbox and moon container
+        const moonToggle = document.getElementById("moonToggle");
+        const moonContainer = document.getElementById("moonContainer");
 
+        // Ensure the moon container is active if the checkbox is checked
+        moonContainer.classList.toggle("active", moonToggle.checked); // This makes sure the moon is visible if checked
+        moonToggle.checked = true; // Ensures the checkbox is checked on load
+
+        // Other settings initialization from localStorage
+        const savedMoonEnabled = localStorage.getItem("moonEnabled") === "true";
+        moonContainer.classList.toggle("active", savedMoonEnabled);
+        moonToggle.checked = savedMoonEnabled; // Ensure the checkbox is checked based on saved settings
         // Load moon toggle
         const moonEnabled = localStorage.getItem("moonEnabled") === "true";
         moonContainer.classList.toggle("active", moonEnabled);
@@ -427,6 +438,16 @@
         );
         localStorage.setItem("theme", theme); // Save to localStorage
       };
+
+      // Theme options
+      const themes = {
+        royal: { bg: "#0f0f0f", text: "#d4af37", gold: "#d4af37" },
+        midnight: { bg: "#0b1220", text: "#b87333", gold: "#8b5e3c" },
+        sapphire: { bg: "#0a1931", text: "#4cc9f0", gold: "#4cc9f0" },
+        rose: { bg: "#1a0f16", text: "#e6399b", gold: "#e6399b" },
+        pearl: { bg: "#0b1220", text: "#f5f5f5", gold: "#c0c0c0" },
+      };
+
       let ramadanData = [];
       let interval;
       let eidLaunched = false;
@@ -533,37 +554,6 @@
         settingsPanel.classList.remove("active");
         overlay.classList.remove("active");
       }
-      bgPicker.oninput = (e) =>
-        document.documentElement.style.setProperty("--bg", e.target.value);
-      textPicker.oninput = (e) =>
-        document.documentElement.style.setProperty("--text", e.target.value);
-      zoomControl.oninput = (e) => {
-        document.documentElement.style.setProperty(
-          "--clock-size",
-          e.target.value + "px",
-        );
-        zoomValue.innerText = e.target.value + "px";
-      };
-      fontSelect.onchange = (e) =>
-        document.documentElement.style.setProperty("--font", e.target.value);
-      moonToggle.onchange = (e) =>
-        moonContainer.classList.toggle("active", e.target.checked);
-
-      /* 🎨 LUXURY COLOR THEMES */
-      const themes = {
-        royal: { bg: "#0f0f0f", text: "#d4af37", gold: "#d4af37" },
-        midnight: { bg: "#0b1220", text: "#b87333", gold: "#8b5e3c" },
-        sapphire: { bg: "#0a1931", text: "#4cc9f0", gold: "#4cc9f0" },
-        rose: { bg: "#1a0f16", text: "#e6399b", gold: "#e6399b" },
-        pearl: { bg: "#0b1220", text: "#f5f5f5", gold: "#c0c0c0" },
-      };
-      themeSelect.onchange = (e) => {
-        const theme = themes[e.target.value];
-        if (!theme) return;
-        document.documentElement.style.setProperty("--bg", theme.bg);
-        document.documentElement.style.setProperty("--text", theme.text);
-        document.documentElement.style.setProperty("--gold", theme.gold);
-      };
 
       /* CSV + COUNTDOWN */
       async function loadCSV() {
@@ -645,7 +635,7 @@
           countLabel.innerText = label;
           hours.innerText = h.toString().padStart(2, "0");
           minutes.innerText = m.toString().padStart(2, "0");
-          seconds.innerText = s.toString().padStart(2, "0");
+          seconds.innerText = s.toString().padStart(2, "00");
         }, 1000); // Update every second
       }
 
