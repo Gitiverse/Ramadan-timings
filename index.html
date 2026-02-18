@@ -268,6 +268,32 @@
         color: white;
         border: 1px solid var(--border);
       }
+      /* Eid Mubarak Message Styling */
+      .eid-message {
+        font-size: 2rem; /* You can adjust the size */
+        margin-top: 30px; /* Space above the message */
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.2); /* Light background */
+        border-radius: 10px;
+        color: #ffd166; /* A nice golden color */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for some glow effect */
+        max-width: 90%; /* Ensures it doesn't stretch too wide on large screens */
+        margin-left: auto;
+        margin-right: auto;
+        width: fit-content;
+        animation: fadeInMessage 1s ease-in-out; /* Add a fade-in effect */
+      }
+
+      @keyframes fadeInMessage {
+        0% {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
     </style>
   </head>
 
@@ -361,19 +387,19 @@
         // Get moon toggle checkbox and moon container
         const moonToggle = document.getElementById("moonToggle");
         const moonContainer = document.getElementById("moonContainer");
-
-        // Ensure the moon container is active if the checkbox is checked
-        moonContainer.classList.toggle("active", moonToggle.checked); // This makes sure the moon is visible if checked
-        moonToggle.checked = true; // Ensures the checkbox is checked on load
+        // Set the moon to be visible by default
+        moonContainer.classList.add("active"); // This will make the moon visible by default
 
         // Other settings initialization from localStorage
         const savedMoonEnabled = localStorage.getItem("moonEnabled") === "true";
         moonContainer.classList.toggle("active", savedMoonEnabled);
         moonToggle.checked = savedMoonEnabled; // Ensure the checkbox is checked based on saved settings
-        // Load moon toggle
-        const moonEnabled = localStorage.getItem("moonEnabled") === "true";
-        moonContainer.classList.toggle("active", moonEnabled);
-        moonToggle.checked = moonEnabled; // Set the checkbox
+        // Save moon setting to localStorage when checkbox is changed
+        moonToggle.onchange = (e) => {
+          const isChecked = e.target.checked;
+          moonContainer.classList.toggle("active", isChecked);
+          localStorage.setItem("moonEnabled", isChecked); // Save to localStorage
+        };
 
         // Load theme
         const savedTheme = localStorage.getItem("theme");
@@ -602,10 +628,28 @@
           const fajr = createDate(now, today.Fajr, "AM");
           const maghrib = createDate(now, today.Maghrib, "PM");
 
-          // Fireworks on Day 30 after Maghrib
+          // **Check if it's Day 30 after Maghrib to show Eid message**
           if (parseInt(today.Day) === 30 && now > maghrib && !eidLaunched) {
             launchFireworks();
             eidLaunched = true; // Prevent fireworks from launching again
+
+            // Show Eid Mubarak message
+            const eidMessage = document.getElementById("eidMessage");
+            eidMessage.innerHTML = `
+              🌙 <strong>Eid Mubarak!</strong> 🌙<br />
+              May this blessed occasion bring peace, joy, and prosperity to you and your loved ones. 🌟
+              <br />
+              Wishing you a heart full of happiness and a life full of blessings. 🌸
+            `; // Your full Eid message
+            eidMessage.style.display = "block"; // Display the message
+
+            // Hide the clock
+            document.querySelector(".clock").style.display = "none"; // Hide the clock
+
+            // Prevent Eid message from showing again
+            setTimeout(() => {
+              eidMessage.style.display = "none";
+            }, 4000); // 4 seconds delay before the message disappears
           }
 
           // Determine target prayer time and label
@@ -641,5 +685,10 @@
 
       loadCSV();
     </script>
+    <!-- Eid Mubarak Message Placeholder -->
+    <div
+      id="eidMessage"
+      style="display: none; font-size: 2rem; margin-top: 20px"
+    ></div>
   </body>
 </html>
