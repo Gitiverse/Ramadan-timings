@@ -22,6 +22,27 @@
         --font: "Outfit", sans-serif;
         --clock-size: 220px;
       }
+      /* For tablets (max-width: 900px) */
+      @media only screen and (max-width: 900px) {
+        :root {
+          --clock-size: 160px; /* Set the clock size to 160px for tablets */
+        }
+        .flip {
+          font-size: var(--clock-size);
+          padding: calc(var(--clock-size) * 0.25) calc(var(--clock-size) * 0.2);
+        }
+      }
+
+      /* For mobile devices (max-width: 600px) */
+      @media only screen and (max-width: 600px) {
+        :root {
+          --clock-size: 100px; /* Set the clock size to 100px on mobile */
+        }
+        .flip {
+          font-size: var(--clock-size);
+          padding: calc(var(--clock-size) * 0.25) calc(var(--clock-size) * 0.2);
+        }
+      }
 
       body {
         margin: 0;
