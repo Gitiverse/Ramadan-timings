@@ -2,243 +2,513 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Ramadan Countdown 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ramadan Countdown</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Playfair+Display:wght@500;700&family=DM+Serif+Display&family=Poppins:wght@400;600&family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0c1b2a" />
 
     <style>
       :root {
-        --base-size: 1; /* zoom scale */
-        --text-color: #00ffcc; /* countdown text color */
-        --day-color: #ffd166; /* day text color */
+        --bg: #0b1220;
+        --text: #00f5d4;
+        --card: rgba(255, 255, 255, 0.05);
+        --border: rgba(255, 255, 255, 0.1);
+        --gold: #ffd166;
+        --font: "Outfit", sans-serif;
+        --clock-size: 220px;
       }
 
       body {
-        font-family: Arial, sans-serif;
+        margin: 0;
+        font-family: var(--font);
         text-align: center;
-        background: #0c1b2a;
-        color: white;
-        margin: 0;
-        transition: background 0.3s ease;
+        background: var(--bg);
+        color: var(--text);
+        overflow-x: hidden;
+        transition: 0.4s;
       }
 
-      h1 {
-        margin: 20px 0 10px 0;
-        font-size: calc(2rem * var(--base-size));
+      /* ✨ RANDOM TWINKLING STARS */
+      .star {
+        position: fixed;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: -3;
+        animation: twinkle 2s infinite ease-in-out alternate;
+      }
+      @keyframes twinkle {
+        0% {
+          opacity: 0.2;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1.6);
+        }
       }
 
-      /* ---------- DARK PANEL FOR TITLE & DAY ---------- */
-      .panel {
-        display: inline-block;
-        padding: 10px 20px;
-        border-radius: 15px;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(5px);
-        color: white;
-        margin-bottom: 10px;
+      /* 🌠 SHOOTING STAR */
+      .shooting-star {
+        position: fixed;
+        width: 180px;
+        height: 2px;
+        background: linear-gradient(90deg, white, rgba(255, 255, 255, 0));
+        filter: drop-shadow(0 0 6px white);
+        pointer-events: none;
+        z-index: -2;
+        opacity: 0;
       }
 
-      /* ---------- CLOUD CONTROL PANEL ---------- */
-      .controls {
-        display: inline-block;
-        padding: 15px 25px;
-        margin: 10px auto 20px auto;
-        border-radius: 20px;
-        background: rgba(0, 0, 0, 0.5); /* dark semi-transparent */
-        backdrop-filter: blur(12px);
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      /* 🎆 FIREWORK */
+      .firework {
+        position: fixed;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 2000;
+        animation: explode 1s ease-out forwards;
+      }
+      @keyframes explode {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(15);
+          opacity: 0;
+        }
       }
 
-      .controls label {
-        font-weight: bold;
-        margin-right: 5px;
+      /* 🌙 MOON */
+      .moon-container {
+        position: fixed;
+        top: 10%;
+        right: 8%;
+        width: 180px;
+        height: 180px;
+        pointer-events: none;
+        opacity: 0;
+        transition: 0.6s;
+      }
+      .moon-container.active {
+        opacity: 0.25;
+      }
+      .moon {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #fff, #d1d5db);
+        position: relative;
+        animation: floatMoon 8s ease-in-out infinite;
+      }
+      .moon::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 40px;
+        width: 100%;
+        height: 100%;
+        background: var(--bg);
+        border-radius: 50%;
+      }
+      @keyframes floatMoon {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-15px);
+        }
       }
 
-      input[type="range"],
-      input[type="color"] {
-        width: 120px;
-        margin-right: 10px;
+      /* HEADER */
+      .header-wrapper {
+        margin: 20px;
+        padding: 25px;
+        border-radius: 25px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
       }
-
-      /* ---------- FULL WIDTH CARDS ---------- */
-      .card {
-        background: #13293d;
-        width: 100vw;
-        max-width: none;
-        margin: 0;
-        border-radius: 0;
-        padding: 40px 10px;
-        box-sizing: border-box;
-        box-shadow: 0 0 25px rgba(0, 255, 204, 0.2);
+      header {
+        font-size: 2rem;
+        font-weight: 600;
       }
-
-      /* ---------- TEXT ---------- */
+      .divider {
+        width: 70px;
+        height: 3px;
+        margin: 15px auto;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--gold),
+          transparent
+        );
+      }
       .day {
-        font-size: calc(3vw * var(--base-size));
-        color: var(--day-color);
-        margin: 10px 0;
-      }
-
-      .time-label {
-        font-size: calc(2vw * var(--base-size));
+        padding: 12px 30px;
+        border-radius: 40px;
+        display: inline-block;
+        background: rgba(255, 209, 102, 0.15);
+        color: var(--gold);
+        border: 1px solid rgba(255, 209, 102, 0.4);
         margin-bottom: 10px;
       }
 
-      .countdown {
-        font-weight: bold;
-        color: var(--text-color);
-        font-size: calc(8vw * var(--base-size));
+      /* BUTTON */
+      button {
+        padding: 10px 20px;
+        border-radius: 30px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: var(--text);
+        color: black;
+      }
+
+      /* CARD */
+      .card {
+        margin: 30px 20px;
+        padding: 40px;
+        border-radius: 30px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(25px);
+      }
+      .label {
+        font-size: 1.2rem;
+        margin-bottom: 25px;
+        opacity: 0.8;
+      }
+
+      /* CLOCK */
+      .clock {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+      .flip {
+        font-size: var(--clock-size);
+        padding: calc(var(--clock-size) * 0.25) calc(var(--clock-size) * 0.2);
+        border-radius: calc(var(--clock-size) * 0.12);
+        background: linear-gradient(145deg, #0f1e2b, #0a1622);
+        border: 1px solid var(--border);
+        min-width: calc(var(--clock-size) * 0.9);
+      }
+      .flip span {
+        display: inline-block;
+      }
+
+      /* SETTINGS */
+      .settings-panel {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        background: #111827;
+        padding: 25px;
+        border-radius: 25px;
+        border: 1px solid var(--border);
+        width: 340px;
+        transition: 0.3s;
+        z-index: 1000;
+      }
+      .settings-panel.active {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+      }
+      .overlay.active {
+        display: block;
+      }
+      select {
+        padding: 8px;
+        border-radius: 8px;
+        background: #1f2937;
+        color: white;
+        border: 1px solid var(--border);
       }
     </style>
   </head>
 
   <body>
-    <div class="panel">
-      <h1>Ramadan Countdown 2026</h1>
+    <div class="moon-container active" id="moonContainer">
+      <div class="moon"></div>
     </div>
 
-    <div class="controls">
-      <label>Background:</label>
-      <input type="color" id="bgPicker" value="#0c1b2a" />
-
-      <label>Text Color:</label>
-      <input type="color" id="textPicker" value="#00ffcc" />
-
-      <label>Zoom:</label>
-      <input
-        type="range"
-        id="zoomSlider"
-        min="1"
-        max="3"
-        step="0.1"
-        value="1"
-      />
-      <span id="zoomValue">100%</span>
-    </div>
-
-    <div class="panel" id="ramadanDay" class="day"></div>
-
-    <div class="card">
-      <div class="time-label">Sunrise</div>
-      <div id="sunriseTime"></div>
-      <div id="sunriseCountdown" class="countdown"></div>
+    <div class="header-wrapper">
+      <header>Ramadan Countdown</header>
+      <div class="divider"></div>
+      <div id="ramadanDay" class="day"></div>
+      <button onclick="openSettings()">⚙ Settings</button>
     </div>
 
     <div class="card">
-      <div class="time-label">Maghrib</div>
-      <div id="maghribTime"></div>
-      <div id="maghribCountdown" class="countdown"></div>
+      <div id="countLabel" class="label"></div>
+      <div class="clock">
+        <div class="flip"><span id="hours">00</span></div>
+        <div class="flip"><span id="minutes">00</span></div>
+        <div class="flip"><span id="seconds">00</span></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeSettings()"></div>
+
+    <div class="settings-panel" id="settingsPanel">
+      <h3>Settings</h3>
+      Background <input type="color" id="bgPicker" /><br /><br />
+      Accent <input type="color" id="textPicker" /><br /><br />
+      Clock Size:
+      <input type="range" id="zoomControl" min="100" max="400" value="220" />
+      <span id="zoomValue">220px</span><br /><br />
+      Font:
+      <select id="fontSelect">
+        <option value="'Outfit', sans-serif">Outfit</option>
+        <option value="'Playfair Display', serif">Playfair</option>
+        <option value="'DM Serif Display', serif">DM Serif</option>
+        <option value="'Poppins', sans-serif">Poppins</option>
+        <option value="'Montserrat', sans-serif">Montserrat</option></select
+      ><br /><br />
+      <label>
+        <input type="checkbox" id="moonToggle" checked /> Enable Animated
+        Crescent </label
+      ><br /><br />
+      Luxury Theme:
+      <select id="themeSelect">
+        <option value="">Default</option>
+        <option value="royal">🏛 Royal Gold</option>
+        <option value="midnight">🌙 Midnight Sky (Brown Accent)</option>
+        <option value="sapphire">🌌 Sapphire Night</option>
+        <option value="rose">🌑 Obsidian Rose</option>
+        <option value="pearl">🕊 Pearl Platinum</option>
+      </select>
     </div>
 
     <script>
-      /* ---------- PARSE CSV ---------- */
-      async function loadCSV() {
-        try {
-          const res = await fetch("Ramadan_timings.csv");
-          const text = await res.text();
+      let ramadanData = [];
+      let interval;
 
-          const data = parseCSV(text);
-          displayToday(data);
-        } catch (e) {
-          document.body.innerHTML =
-            "<h2>Error loading Ramadan timings file.</h2>";
-          console.error(e);
+      /* ✨ RANDOM STARS */
+      function createStars(count = 150) {
+        for (let i = 0; i < count; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          star.style.left = Math.random() * 100 + "vw";
+          star.style.top = Math.random() * 100 + "vh";
+          star.style.animationDelay = Math.random() * 3 + "s";
+          document.body.appendChild(star);
+        }
+      }
+      createStars();
+
+      /* 🌠 RANDOM SHOOTING STARS */
+      function createShootingStars() {
+        setInterval(() => {
+          const star = document.createElement("div");
+          star.className = "shooting-star";
+
+          const startX = Math.random() * window.innerWidth;
+          const startY = Math.random() * window.innerHeight * 0.5;
+
+          star.style.left = startX + "px";
+          star.style.top = startY + "px";
+
+          const angle = Math.random() * 60 + 20;
+          const distance = window.innerWidth * 1.5;
+          const duration = Math.random() * 2000 + 2000;
+
+          document.body.appendChild(star);
+
+          const trailInterval = setInterval(() => {
+            const trail = document.createElement("div");
+            trail.style.position = "fixed";
+            trail.style.width = "4px";
+            trail.style.height = "4px";
+            trail.style.borderRadius = "50%";
+            trail.style.background = "white";
+            trail.style.boxShadow = "0 0 6px white";
+            trail.style.pointerEvents = "none";
+
+            const rect = star.getBoundingClientRect();
+            trail.style.left = rect.left + "px";
+            trail.style.top = rect.top + "px";
+
+            trail.style.opacity = "0.8";
+            trail.style.transition = "opacity 0.8s ease-out";
+
+            document.body.appendChild(trail);
+
+            setTimeout(() => {
+              trail.style.opacity = "0";
+              setTimeout(() => trail.remove(), 800);
+            }, 50);
+          }, 80);
+
+          star.animate(
+            [
+              { transform: `rotate(${angle}deg) translateX(0px)`, opacity: 0 },
+              { opacity: 1, offset: 0.1 },
+              {
+                transform: `rotate(${angle}deg) translateX(${distance}px)`,
+                opacity: 0,
+              },
+            ],
+            {
+              duration: duration,
+              easing: "ease-out",
+            },
+          );
+
+          setTimeout(() => {
+            clearInterval(trailInterval);
+            star.remove();
+          }, duration);
+        }, 4000);
+      }
+
+      createShootingStars();
+
+      /* 🎆 FIREWORKS */
+      function launchFireworks() {
+        for (let i = 0; i < 30; i++) {
+          const fw = document.createElement("div");
+          fw.className = "firework";
+          fw.style.left = Math.random() * 100 + "%";
+          fw.style.top = Math.random() * 100 + "%";
+          fw.style.background = `hsl(${Math.random() * 360},100%,60%)`;
+          document.body.appendChild(fw);
+          setTimeout(() => fw.remove(), 1000);
         }
       }
 
-      /* ---------- CSV PARSER ---------- */
+      /* SETTINGS PANEL */
+      function openSettings() {
+        settingsPanel.classList.add("active");
+        overlay.classList.add("active");
+      }
+      function closeSettings() {
+        settingsPanel.classList.remove("active");
+        overlay.classList.remove("active");
+      }
+      bgPicker.oninput = (e) =>
+        document.documentElement.style.setProperty("--bg", e.target.value);
+      textPicker.oninput = (e) =>
+        document.documentElement.style.setProperty("--text", e.target.value);
+      zoomControl.oninput = (e) => {
+        document.documentElement.style.setProperty(
+          "--clock-size",
+          e.target.value + "px",
+        );
+        zoomValue.innerText = e.target.value + "px";
+      };
+      fontSelect.onchange = (e) =>
+        document.documentElement.style.setProperty("--font", e.target.value);
+      moonToggle.onchange = (e) =>
+        moonContainer.classList.toggle("active", e.target.checked);
+
+      /* 🎨 LUXURY COLOR THEMES */
+      const themes = {
+        royal: { bg: "#0f0f0f", text: "#d4af37", gold: "#d4af37" },
+        midnight: { bg: "#0b1220", text: "#b87333", gold: "#8b5e3c" },
+        sapphire: { bg: "#0a1931", text: "#4cc9f0", gold: "#4cc9f0" },
+        rose: { bg: "#1a0f16", text: "#e6399b", gold: "#e6399b" },
+        pearl: { bg: "#0b1220", text: "#f5f5f5", gold: "#c0c0c0" },
+      };
+      themeSelect.onchange = (e) => {
+        const theme = themes[e.target.value];
+        if (!theme) return;
+        document.documentElement.style.setProperty("--bg", theme.bg);
+        document.documentElement.style.setProperty("--text", theme.text);
+        document.documentElement.style.setProperty("--gold", theme.gold);
+      };
+
+      /* CSV + COUNTDOWN */
+      async function loadCSV() {
+        const res = await fetch("Ramadan_timings.csv");
+        const text = await res.text();
+        ramadanData = parseCSV(text);
+        startCountdown();
+      }
       function parseCSV(text) {
         const lines = text.trim().split("\n");
         const headers = lines[0].split(",");
-        const data = [];
-
-        for (let i = 1; i < lines.length; i++) {
-          const regex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
-          const matches = lines[i].match(regex);
-          if (!matches) continue;
-
-          const row = {};
-          headers.forEach((header, idx) => {
-            row[header.trim()] = matches[idx].replace(/^"|"$/g, "").trim();
-          });
-          data.push(row);
-        }
-        return data;
-      }
-
-      /* ---------- DISPLAY TODAY ---------- */
-      function displayToday(data) {
-        const today = new Date();
-        const todayRow = data.find((row) => {
-          const dateStr = `${row["Gregorian Date"]} ${today.getFullYear()}`;
-          const dt = new Date(dateStr);
-          return dt.toDateString() === today.toDateString();
+        return lines.slice(1).map((line) => {
+          const values = line.split(",");
+          const obj = {};
+          headers.forEach((h, i) => (obj[h.trim()] = values[i]?.trim()));
+          return obj;
         });
-
-        if (!todayRow) {
-          document.getElementById("ramadanDay").innerText =
-            "No Ramadan data for today.";
-          return;
-        }
-
-        document.getElementById("ramadanDay").innerText =
-          `Ramadan Day ${todayRow.Day}`;
-        document.getElementById("sunriseTime").innerText = todayRow.Sunrise;
-        document.getElementById("maghribTime").innerText = todayRow.Maghrib;
-
-        startCountdown("sunriseCountdown", todayRow.Sunrise);
-        startCountdown("maghribCountdown", todayRow.Maghrib);
       }
-
-      /* ---------- COUNTDOWN ---------- */
-      function startCountdown(elementId, timeString) {
-        const interval = setInterval(() => {
+      function getRowFromDate(date) {
+        const month = date.toLocaleString("en-US", { month: "short" });
+        const day = date.getDate();
+        return ramadanData.find((row) => {
+          const [m, d] = row["Gregorian Date"].split(" ");
+          return m === month && parseInt(d) === day;
+        });
+      }
+      function createDate(base, time, period) {
+        let [h, m] = time.split(":").map(Number);
+        if (period === "PM" && h < 12) h += 12;
+        const d = new Date(base);
+        d.setHours(h, m, 0, 0);
+        return d;
+      }
+      function startCountdown() {
+        clearInterval(interval);
+        interval = setInterval(() => {
           const now = new Date();
-          const [hours, minutes] = timeString.split(":").map(Number);
-          const target = new Date();
-          target.setHours(hours, minutes, 0, 0);
-          let diff = target - now;
-
-          if (diff <= 0) {
-            document.getElementById(elementId).innerText = "Time Passed";
-            clearInterval(interval);
-            return;
+          const today = getRowFromDate(now);
+          if (!today) return;
+          ramadanDay.innerText = "Ramadan Day " + today.Day;
+          const fajr = createDate(now, today.Fajr, "AM");
+          const maghrib = createDate(now, today.Maghrib, "PM");
+          if (parseInt(today.Day) >= 29 && now > maghrib) launchFireworks();
+          let target, label;
+          if (now < fajr) {
+            target = fajr;
+            label = "Fajr begins in";
+          } else if (now < maghrib) {
+            target = maghrib;
+            label = "Iftar in";
+          } else {
+            const tomorrow = new Date(now);
+            tomorrow.setDate(now.getDate() + 1);
+            const row = getRowFromDate(tomorrow);
+            if (!row) return;
+            target = createDate(tomorrow, row.Fajr, "AM");
+            label = "Fajr begins in";
           }
-
-          const h = Math.floor(diff / (1000 * 60 * 60));
-          const m = Math.floor((diff / (1000 * 60)) % 60);
-          const s = Math.floor((diff / 1000) % 60);
-
-          document.getElementById(elementId).innerText = `${h}h ${m}m ${s}s`;
+          const diff = Math.max(0, target - now);
+          const h = Math.floor(diff / 3600000);
+          const m = Math.floor((diff % 3600000) / 60000);
+          const s = Math.floor((diff % 60000) / 1000);
+          countLabel.innerText = label;
+          hours.innerText = h.toString().padStart(2, "0");
+          minutes.innerText = m.toString().padStart(2, "0");
+          seconds.innerText = s.toString().padStart(2, "0");
         }, 1000);
       }
 
-      /* ---------- BACKGROUND PICKER ---------- */
-      document
-        .getElementById("bgPicker")
-        .addEventListener("input", function () {
-          document.body.style.background = this.value;
-        });
-
-      /* ---------- TEXT COLOR PICKER ---------- */
-      document
-        .getElementById("textPicker")
-        .addEventListener("input", function () {
-          document.documentElement.style.setProperty(
-            "--text-color",
-            this.value,
-          );
-        });
-
-      /* ---------- SHARP ZOOM ---------- */
-      document
-        .getElementById("zoomSlider")
-        .addEventListener("input", function () {
-          const scale = this.value;
-          document.documentElement.style.setProperty("--base-size", scale);
-          document.getElementById("zoomValue").innerText =
-            Math.round(scale * 100) + "%";
-        });
-
-      /* ---------- INIT ---------- */
       loadCSV();
     </script>
   </body>
