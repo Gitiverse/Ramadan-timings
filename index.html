@@ -355,8 +355,18 @@
         return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
       }
 
-      // Show instructions for Safari users
+      // Function to check if the app is running in standalone mode (installed as PWA)
+      function isStandalone() {
+        return window.matchMedia("(display-mode: standalone)").matches;
+      }
+
+      // Show instructions for Safari users only if not installed
       function showSafariInstructions() {
+        // If the app is installed as a PWA, don't show the message
+        if (isStandalone()) {
+          return;
+        }
+
         const safariBanner = document.createElement("div");
         safariBanner.style.position = "fixed";
         safariBanner.style.bottom = "20px";
@@ -382,7 +392,7 @@
 
       // When the page is ready and events are set up
       window.addEventListener("load", () => {
-        if (isSafari()) {
+        if (isSafari() && !isStandalone()) {
           showSafariInstructions();
         }
       });
