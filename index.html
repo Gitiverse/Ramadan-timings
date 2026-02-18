@@ -325,6 +325,108 @@
     </div>
 
     <script>
+      // Function to load settings from localStorage
+      document.addEventListener("DOMContentLoaded", () => {
+        // Load background color
+        const savedBgColor = localStorage.getItem("bgColor");
+        if (savedBgColor) {
+          document.documentElement.style.setProperty("--bg", savedBgColor);
+          bgPicker.value = savedBgColor; // Set the color picker value
+        }
+
+        // Load text color
+        const savedTextColor = localStorage.getItem("textColor");
+        if (savedTextColor) {
+          document.documentElement.style.setProperty("--text", savedTextColor);
+          textPicker.value = savedTextColor; // Set the color picker value
+        }
+
+        // Load clock size
+        const savedClockSize = localStorage.getItem("clockSize");
+        if (savedClockSize) {
+          document.documentElement.style.setProperty(
+            "--clock-size",
+            savedClockSize,
+          );
+          zoomControl.value = parseInt(savedClockSize); // Set the range input value
+          zoomValue.innerText = savedClockSize; // Update clock size display
+        }
+
+        // Load font
+        const savedFont = localStorage.getItem("font");
+        if (savedFont) {
+          document.documentElement.style.setProperty("--font", savedFont);
+          fontSelect.value = savedFont; // Set the font select value
+        }
+
+        // Load moon toggle
+        const moonEnabled = localStorage.getItem("moonEnabled") === "true";
+        moonContainer.classList.toggle("active", moonEnabled);
+        moonToggle.checked = moonEnabled; // Set the checkbox
+
+        // Load theme
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) {
+          const theme = themes[savedTheme] || {};
+          document.documentElement.style.setProperty("--bg", theme.bg || "");
+          document.documentElement.style.setProperty(
+            "--text",
+            theme.text || "",
+          );
+          document.documentElement.style.setProperty(
+            "--gold",
+            theme.gold || "",
+          );
+          themeSelect.value = savedTheme; // Set the theme select value
+        }
+      });
+
+      // Save settings to localStorage when user changes them
+      bgPicker.oninput = (e) => {
+        const color = e.target.value;
+        document.documentElement.style.setProperty("--bg", color);
+        localStorage.setItem("bgColor", color); // Save to localStorage
+      };
+
+      textPicker.oninput = (e) => {
+        const color = e.target.value;
+        document.documentElement.style.setProperty("--text", color);
+        localStorage.setItem("textColor", color); // Save to localStorage
+      };
+
+      zoomControl.oninput = (e) => {
+        const size = e.target.value + "px";
+        document.documentElement.style.setProperty("--clock-size", size);
+        zoomValue.innerText = e.target.value + "px";
+        localStorage.setItem("clockSize", size); // Save to localStorage
+      };
+
+      fontSelect.onchange = (e) => {
+        const font = e.target.value;
+        document.documentElement.style.setProperty("--font", font);
+        localStorage.setItem("font", font); // Save to localStorage
+      };
+
+      moonToggle.onchange = (e) => {
+        const isChecked = e.target.checked;
+        moonContainer.classList.toggle("active", isChecked);
+        localStorage.setItem("moonEnabled", isChecked); // Save to localStorage
+      };
+
+      themeSelect.onchange = (e) => {
+        const theme = e.target.value;
+        const themeData = themes[theme] || {};
+        document.documentElement.style.setProperty("--bg", themeData.bg || "");
+        document.documentElement.style.setProperty(
+          "--text",
+          themeData.text || "",
+        );
+        document.documentElement.style.setProperty(
+          "--gold",
+          themeData.gold || "",
+        );
+        localStorage.setItem("theme", theme); // Save to localStorage
+      };
       let ramadanData = [];
       let interval;
       let eidLaunched = false;
