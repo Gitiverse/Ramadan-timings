@@ -387,13 +387,18 @@
         // Get moon toggle checkbox and moon container
         const moonToggle = document.getElementById("moonToggle");
         const moonContainer = document.getElementById("moonContainer");
-        // Set the moon to be visible by default
-        moonContainer.classList.add("active"); // This will make the moon visible by default
 
-        // Other settings initialization from localStorage
+        // Load moon setting from localStorage if already set
         const savedMoonEnabled = localStorage.getItem("moonEnabled") === "true";
-        moonContainer.classList.toggle("active", savedMoonEnabled);
-        moonToggle.checked = savedMoonEnabled; // Ensure the checkbox is checked based on saved settings
+
+        // Apply saved moon visibility setting from localStorage
+        if (savedMoonEnabled) {
+          moonContainer.classList.add("active");
+          moonToggle.checked = true;
+        } else {
+          moonContainer.classList.remove("active");
+          moonToggle.checked = false;
+        }
         // Save moon setting to localStorage when checkbox is changed
         moonToggle.onchange = (e) => {
           const isChecked = e.target.checked;
