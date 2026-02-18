@@ -306,6 +306,7 @@
     <script>
       let ramadanData = [];
       let interval;
+      let eidLaunched = false;
 
       /* ✨ RANDOM STARS */
       function createStars(count = 150) {
@@ -478,11 +479,23 @@
         interval = setInterval(() => {
           const now = new Date();
           const today = getRowFromDate(now);
-          if (!today) return;
+
+          if (!today) return; // If no data for today, return early
+
+          // Display current Ramadan day
           ramadanDay.innerText = "Ramadan Day " + today.Day;
+
+          // Define prayer times
           const fajr = createDate(now, today.Fajr, "AM");
           const maghrib = createDate(now, today.Maghrib, "PM");
-          if (parseInt(today.Day) >= 29 && now > maghrib) launchFireworks();
+
+          // Fireworks on Day 30 after Maghrib
+          if (parseInt(today.Day) === 30 && now > maghrib && !eidLaunched) {
+            launchFireworks();
+            eidLaunched = true; // Prevent fireworks from launching again
+          }
+
+          // Determine target prayer time and label
           let target, label;
           if (now < fajr) {
             target = fajr;
@@ -492,21 +505,25 @@
             label = "Iftar in";
           } else {
             const tomorrow = new Date(now);
-            tomorrow.setDate(now.getDate() + 1);
+            tomorrow.setDate(now.getDate() + 1); // Go to the next day
             const row = getRowFromDate(tomorrow);
-            if (!row) return;
+            if (!row) return; // If no data for the next day, return early
             target = createDate(tomorrow, row.Fajr, "AM");
             label = "Fajr begins in";
           }
+
+          // Calculate time difference
           const diff = Math.max(0, target - now);
-          const h = Math.floor(diff / 3600000);
-          const m = Math.floor((diff % 3600000) / 60000);
-          const s = Math.floor((diff % 60000) / 1000);
+          const h = Math.floor(diff / 3600000); // Hours
+          const m = Math.floor((diff % 3600000) / 60000); // Minutes
+          const s = Math.floor((diff % 60000) / 1000); // Seconds
+
+          // Update countdown display
           countLabel.innerText = label;
           hours.innerText = h.toString().padStart(2, "0");
           minutes.innerText = m.toString().padStart(2, "0");
           seconds.innerText = s.toString().padStart(2, "0");
-        }, 1000);
+        }, 1000); // Update every second
       }
 
       loadCSV();
