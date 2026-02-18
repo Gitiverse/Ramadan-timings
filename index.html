@@ -349,8 +349,105 @@
         <option value="pearl">🕊 Pearl Platinum</option>
       </select>
     </div>
+    <script>
+      // Function to check if the user is on Safari (iPhone or Mac)
+      function isSafari() {
+        return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      }
+
+      // Show instructions for Safari users
+      function showSafariInstructions() {
+        const safariBanner = document.createElement("div");
+        safariBanner.style.position = "fixed";
+        safariBanner.style.bottom = "20px";
+        safariBanner.style.left = "50%";
+        safariBanner.style.transform = "translateX(-50%)";
+        safariBanner.style.padding = "10px 20px";
+        safariBanner.style.backgroundColor = "#007aff"; // iOS-like blue
+        safariBanner.style.color = "#fff";
+        safariBanner.style.fontSize = "14px";
+        safariBanner.style.textAlign = "center";
+        safariBanner.style.zIndex = "9999"; // Make sure it's on top
+        safariBanner.innerHTML =
+          'To add this app to your Home Screen, tap the Share icon and select "Add to Home Screen / Dock".';
+
+        // Append the banner to the body
+        document.body.appendChild(safariBanner);
+
+        // Make the banner dismissible
+        safariBanner.addEventListener("click", () => {
+          safariBanner.style.display = "none";
+        });
+      }
+
+      // When the page is ready and events are set up
+      window.addEventListener("load", () => {
+        if (isSafari()) {
+          showSafariInstructions();
+        }
+      });
+    </script>
 
     <script>
+      let deferredPrompt;
+
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+
+        // Create a custom "Add to Home Screen" button
+        const addToHomeScreenBtn = document.createElement("button");
+        addToHomeScreenBtn.textContent = "Add to Home Screen";
+
+        // Style the button
+        addToHomeScreenBtn.style.position = "fixed";
+        addToHomeScreenBtn.style.bottom = "30px"; // Slightly higher to avoid corner
+        addToHomeScreenBtn.style.left = "50%"; // Center horizontally
+        addToHomeScreenBtn.style.transform = "translateX(-50%)"; // Center the button precisely
+        addToHomeScreenBtn.style.padding = "15px 25px"; // Larger padding for better size
+        addToHomeScreenBtn.style.background =
+          "linear-gradient(145deg, #ffd166, #ff5f00)"; // Gradient background
+        addToHomeScreenBtn.style.color = "#fff";
+        addToHomeScreenBtn.style.border = "none";
+        addToHomeScreenBtn.style.borderRadius = "50px"; // Rounded corners
+        addToHomeScreenBtn.style.fontSize = "18px"; // Larger font size for visibility
+        addToHomeScreenBtn.style.fontWeight = "bold"; // Make it more prominent
+        addToHomeScreenBtn.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.3)"; // Soft shadow for depth
+        addToHomeScreenBtn.style.cursor = "pointer";
+        addToHomeScreenBtn.style.transition = "transform 0.3s ease-in-out"; // Smooth transition for hover effect
+
+        // Add an icon to make it clearer (using emoji for simplicity)
+        addToHomeScreenBtn.innerHTML =
+          '<span style="font-size: 24px;">🏠</span> ' +
+          addToHomeScreenBtn.textContent;
+
+        // Append the button to the body
+        document.body.appendChild(addToHomeScreenBtn);
+
+        // Button hover effect to make it pop
+        addToHomeScreenBtn.addEventListener("mouseenter", () => {
+          addToHomeScreenBtn.style.transform = "scale(1.1)"; // Slightly enlarge on hover
+        });
+
+        addToHomeScreenBtn.addEventListener("mouseleave", () => {
+          addToHomeScreenBtn.style.transform = "scale(1)"; // Return to normal size
+        });
+
+        // Handle the click on the button
+        addToHomeScreenBtn.addEventListener("click", () => {
+          deferredPrompt.prompt(); // Show the install prompt
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === "accepted") {
+              console.log("User accepted the A2HS prompt");
+            } else {
+              console.log("User dismissed the A2HS prompt");
+            }
+            deferredPrompt = null;
+            addToHomeScreenBtn.style.display = "none"; // Hide the prompt button after being clicked
+          });
+        });
+      });
+
       // Function to load settings from localStorage
       document.addEventListener("DOMContentLoaded", () => {
         // Load background color
